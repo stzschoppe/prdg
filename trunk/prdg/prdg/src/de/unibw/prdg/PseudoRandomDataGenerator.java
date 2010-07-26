@@ -1,6 +1,8 @@
 package de.unibw.prdg;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 
 import de.unibw.prdg.exceptions.ConstrainException;
@@ -12,7 +14,7 @@ public class PseudoRandomDataGenerator {
 	private final long seed;
 	private int[][] jobListe;
 	private File dataFile;
-	private double stichprobenMittelBeginn = -1; //TODO implement
+	private double stichprobenMittelBeginn = -1; 
 	private double stichprobenMittelDauer = -1;
 	private double stichprobenVarianzBeginn = -1;
 	private double stichprobenVarianzDauer = -1;
@@ -70,11 +72,12 @@ public class PseudoRandomDataGenerator {
 		try {
 			checkConstrains();
 			generatePseudorandomDataNN();
+			saveDataFile();
 			System.out.println("Beginn (" + getStichprobenMittelBeginn() + ", " 
 					+ getStichprobenVarianzBeginn() + ")");
 			System.out.println("Dauer (" + getStichprobenMittelDauer() + ", " 
 					+ getStichprobenVarianzDauer() + ")");
-		} catch (ConstrainException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -120,11 +123,12 @@ public class PseudoRandomDataGenerator {
 		try {
 			checkConstrains();
 			generatePseudorandomDataNU();
+			saveDataFile();
 			System.out.println("Beginn (" + getStichprobenMittelBeginn() + ", " 
 					+ getStichprobenVarianzBeginn() + ")");
 			System.out.println("Dauer (" + getStichprobenMittelDauer() + ", " 
 					+ getStichprobenVarianzDauer() + ")");
-		} catch (ConstrainException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -168,11 +172,12 @@ public class PseudoRandomDataGenerator {
 		try {
 			checkConstrains();
 			generatePseudorandomDataUN();
+			saveDataFile();
 			System.out.println("Beginn (" + getStichprobenMittelBeginn() + ", " 
 					+ getStichprobenVarianzBeginn() + ")");
 			System.out.println("Dauer (" + getStichprobenMittelDauer() + ", " 
 					+ getStichprobenVarianzDauer() + ")");
-		} catch (ConstrainException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -216,11 +221,12 @@ public class PseudoRandomDataGenerator {
 		try {
 			checkConstrains();
 			generatePseudorandomDataUU();
+			saveDataFile();
 			System.out.println("Beginn (" + getStichprobenMittelBeginn() + ", " 
 					+ getStichprobenVarianzBeginn() + ")");
 			System.out.println("Dauer (" + getStichprobenMittelDauer() + ", " 
 					+ getStichprobenVarianzDauer() + ")");
-		} catch (ConstrainException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -402,6 +408,30 @@ public class PseudoRandomDataGenerator {
 		}
 		sigmaSqr /= jobCount-1;
 		return sigmaSqr;
-	}	
+	}
+	
+	private void saveDataFile() throws IOException{
+			FileWriter fw = new FileWriter(dataFile);
+			String buffer = "";
+			String header = "";
+			
+			header += "#test intervalle\n";
+			header += "# zeilen mit # = Kommentare\n";
+			header += "#	assuming b-c format,\n";
+			header += "#		for interval naming a sequencial numbering is used, starting at 0\n";
+			header += "#		b starttime,\n";
+			header += "#		c endtime,\n";
+			header += "#		b and c inclusive\n";
+			header += "\n";
+			
+			fw.write(header);
+			
+			for (int i = 0; i < jobListe.length; i++) {
+				buffer = jobListe[i][0] + "-" + (jobListe[i][0]+jobListe[i][1]-1)+"\n";
+				fw.write(buffer);
+			}
+			
+			fw.close();
+	}
 
 }
