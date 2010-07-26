@@ -2,6 +2,11 @@ package de.unibw.prdg.exceptions;
 
 public class ConstrainException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6444612310245419790L;
+
 	public ConstrainException() {
 		super();
 		// TODO Auto-generated constructor stub
