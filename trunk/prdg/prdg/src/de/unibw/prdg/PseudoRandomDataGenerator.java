@@ -14,10 +14,6 @@ public class PseudoRandomDataGenerator {
 	private final long seed;
 	private int[][] jobListe;
 	private File dataFile;
-	private double stichprobenMittelBeginn = -1; 
-	private double stichprobenMittelDauer = -1;
-	private double stichprobenVarianzBeginn = -1;
-	private double stichprobenVarianzDauer = -1;
 	
 	private final char verteilungBeginn;
 	private final double myBeginn;
