@@ -36,21 +36,21 @@ public class PseudoRandomDataGenerator {
 	 * @param start
 	 * @param ende
 	 * @param seed
-	 * @param dataFileName
+	 * @param dataFile 
 	 * @param myBeginn
 	 * @param sigmaSqrBeginn
 	 * @param myDauer
 	 * @param sigmaSqrDauer
 	 */
 	public PseudoRandomDataGenerator(int jobCount, int start, int ende,
-			long seed, String dataFileName, double myBeginn,
+			long seed, File dataFile, double myBeginn,
 			double sigmaSqrBeginn, double myDauer, double sigmaSqrDauer) {
 		super();
 		this.jobCount = jobCount;
 		this.start = start;
 		this.ende = ende;
 		this.seed = seed;
-		this.dataFile = new File(dataFileName);
+		this.dataFile = dataFile;
 		this.jobListe = new int[jobCount][2];
 
 		this.verteilungBeginn = 'N';
@@ -95,14 +95,14 @@ public class PseudoRandomDataGenerator {
 	 * @param bDauer
 	 */
 	public PseudoRandomDataGenerator(int jobCount, int start, int ende,
-			long seed, String dataFileName, double myBeginn,
+			long seed, File dataFile, double myBeginn,
 			double sigmaSqrBeginn, int aDauer, int bDauer) {
 		super();
 		this.jobCount = jobCount;
 		this.start = start;
 		this.ende = ende;
 		this.seed = seed;
-		this.dataFile = new File(dataFileName);
+		this.dataFile = dataFile;
 		this.jobListe = new int[jobCount][2];
 
 		this.verteilungBeginn = 'N';
@@ -144,13 +144,13 @@ public class PseudoRandomDataGenerator {
 	 * @param sigmaSqrDauer
 	 */
 	public PseudoRandomDataGenerator(int jobCount, int start, int ende,
-			long seed, String dataFileName, double myDauer, double sigmaSqrDauer) {
+			long seed, File dataFile, double myDauer, double sigmaSqrDauer) {
 		super();
 		this.jobCount = jobCount;
 		this.start = start;
 		this.ende = ende;
 		this.seed = seed;
-		this.dataFile = new File(dataFileName);
+		this.dataFile = dataFile;
 		this.jobListe = new int[jobCount][2];
 
 		this.verteilungBeginn = 'U';
@@ -193,13 +193,13 @@ public class PseudoRandomDataGenerator {
 	 * @param bDauer
 	 */
 	public PseudoRandomDataGenerator(int jobCount, int start, int ende,
-			long seed, String dataFileName, int aDauer, int bDauer) {
+			long seed, File dataFile, int aDauer, int bDauer) {
 		super();
 		this.jobCount = jobCount;
 		this.start = start;
 		this.ende = ende;
 		this.seed = seed;
-		this.dataFile = new File(dataFileName);
+		this.dataFile = dataFile;
 		this.jobListe = new int[jobCount][2];
 
 		this.verteilungBeginn = 'U';
