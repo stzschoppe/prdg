@@ -2,36 +2,95 @@
  * GeneratorView.java
  */
 
-package de.unibw.prdg.gui;
-
-import java.awt.Dimension;
-import java.io.File;
-import java.security.SecureRandom;
-
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileNameExtensionFilter;
+package de.unibw.prdg.deprecated;
 
 import org.jdesktop.application.Action;
-import org.jdesktop.application.FrameView;
+import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
+import org.jdesktop.application.FrameView;
+import org.jdesktop.application.TaskMonitor;
 
-import de.unibw.prdg.ScenarioGenerator;
-import de.unibw.prdg.Verteilung;
-import de.unibw.prdg.Verteilungsparameter;
+import de.unibw.prdg.gui.GeneratorAboutBox;
+import de.unibw.prdg.gui.GeneratorApp;
+import de.unibw.prdg.gui.GeneratorView;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.print.attribute.TextSyntax;
+import javax.swing.JFileChooser;
+import javax.swing.Timer;
+import javax.swing.Icon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * The application's main frame.
  */
-public class GeneratorView extends FrameView {
-	
-	private JFileChooser generatorFileChooser;
+public class GeneratorView2 extends FrameView {
 
-    public GeneratorView(SingleFrameApplication app) {
+    private JFileChooser generatorFileChooser;
+
+	public GeneratorView2(SingleFrameApplication app) {
         super(app);
 
         initComponents();
+
+        // status bar initialization - message timeout, idle icon and busy animation, etc
+        ResourceMap resourceMap = getResourceMap();
+        int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
+        messageTimer = new Timer(messageTimeout, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                statusMessageLabel.setText("");
+            }
+        });
+        messageTimer.setRepeats(false);
+        int busyAnimationRate = resourceMap.getInteger("StatusBar.busyAnimationRate");
+        for (int i = 0; i < busyIcons.length; i++) {
+            busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
+        }
+        busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
+                statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
+            }
+        });
+        idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
+        statusAnimationLabel.setIcon(idleIcon);
+        progressBar.setVisible(false);
+
+        // connecting action tasks to status bar via TaskMonitor
+        TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
+        taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                String propertyName = evt.getPropertyName();
+                if ("started".equals(propertyName)) {
+                    if (!busyIconTimer.isRunning()) {
+                        statusAnimationLabel.setIcon(busyIcons[0]);
+                        busyIconIndex = 0;
+                        busyIconTimer.start();
+                    }
+                    progressBar.setVisible(true);
+                    progressBar.setIndeterminate(true);
+                } else if ("done".equals(propertyName)) {
+                    busyIconTimer.stop();
+                    statusAnimationLabel.setIcon(idleIcon);
+                    progressBar.setVisible(false);
+                    progressBar.setValue(0);
+                } else if ("message".equals(propertyName)) {
+                    String text = (String)(evt.getNewValue());
+                    statusMessageLabel.setText((text == null) ? "" : text);
+                    messageTimer.restart();
+                } else if ("progress".equals(propertyName)) {
+                    int value = (Integer)(evt.getNewValue());
+                    progressBar.setVisible(true);
+                    progressBar.setIndeterminate(false);
+                    progressBar.setValue(value);
+                }
+            }
+        });
     }
 
     @Action
@@ -81,32 +140,37 @@ public class GeneratorView extends FrameView {
         labelParameterDauerB = new javax.swing.JLabel();
         textParameterDauerB = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
-        labelSeed = new javax.swing.JLabel();
-        textSeed = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
         buttonErzeugen = new javax.swing.JButton();
-        buttonSeedGenerieren = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenu helpMenu = new javax.swing.JMenu();
         javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
+        statusPanel = new javax.swing.JPanel();
+        javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
+        statusMessageLabel = new javax.swing.JLabel();
+        statusAnimationLabel = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
 
         mainPanel.setName("mainPanel"); // NOI18N
         mainPanel.setLayout(new java.awt.BorderLayout());
 
         panelZeitraum.setName("panelZeitraum"); // NOI18N
 
-        labelZeitraum.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        labelZeitraum.setText("Zeitraum");
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getResourceMap(GeneratorView.class);
+        labelZeitraum.setFont(resourceMap.getFont("labelZeitraum.font")); // NOI18N
+        labelZeitraum.setText(resourceMap.getString("labelZeitraum.text")); // NOI18N
         labelZeitraum.setName("labelZeitraum"); // NOI18N
 
-        labelZeitraumBeginn.setText("Beginn:");
+        labelZeitraumBeginn.setText(resourceMap.getString("labelZeitraumBeginn.text")); // NOI18N
         labelZeitraumBeginn.setName("labelZeitraumBeginn"); // NOI18N
 
-        labelZeitraumEnde.setText("Ende:");
+        labelZeitraumEnde.setText(resourceMap.getString("labelZeitraumEnde.text")); // NOI18N
         labelZeitraumEnde.setName("labelZeitraumEnde"); // NOI18N
 
-        textZeitraumBeginn.setText("0");
+        textZeitraumBeginn.setText(resourceMap.getString("textZeitraumBeginn.text")); // NOI18N
         textZeitraumBeginn.setName("textZeitraumBeginn"); // NOI18N
         textZeitraumBeginn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,7 +178,7 @@ public class GeneratorView extends FrameView {
             }
         });
 
-        textZeitraumEnde.setText("200");
+        textZeitraumEnde.setText(resourceMap.getString("textZeitraumEnde.text")); // NOI18N
         textZeitraumEnde.setName("textZeitraumEnde"); // NOI18N
         textZeitraumEnde.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -122,10 +186,10 @@ public class GeneratorView extends FrameView {
             }
         });
 
-        labelAnzahl.setText("Anzahl:");
+        labelAnzahl.setText(resourceMap.getString("labelAnzahl.text")); // NOI18N
         labelAnzahl.setName("labelAnzahl"); // NOI18N
 
-        jTextField2.setText("100");
+        jTextField2.setText(resourceMap.getString("jTextField2.text")); // NOI18N
         jTextField2.setName("jTextField2"); // NOI18N
 
         javax.swing.GroupLayout panelZeitraumLayout = new javax.swing.GroupLayout(panelZeitraum);
@@ -146,7 +210,7 @@ public class GeneratorView extends FrameView {
                 .addComponent(labelAnzahl)
                 .addGap(18, 18, 18)
                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(115, Short.MAX_VALUE))
+                .addContainerGap(84, Short.MAX_VALUE))
         );
 
         panelZeitraumLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jTextField2, textZeitraumBeginn, textZeitraumEnde});
@@ -173,31 +237,36 @@ public class GeneratorView extends FrameView {
 
         panelParameter.setName("panelParameter"); // NOI18N
 
-        labelParameter.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        labelParameter.setText("Aufträge");
+        labelParameter.setFont(resourceMap.getFont("labelParameter.font")); // NOI18N
+        labelParameter.setText(resourceMap.getString("labelParameter.text")); // NOI18N
         labelParameter.setName("labelParameter"); // NOI18N
 
-        labelParameterBeginn.setText("Beginn:");
+        labelParameterBeginn.setText(resourceMap.getString("labelParameterBeginn.text")); // NOI18N
         labelParameterBeginn.setName("labelParameterBeginn"); // NOI18N
 
-        labelParameterDauer.setText("Dauer:");
+        labelParameterDauer.setText(resourceMap.getString("labelParameterDauer.text")); // NOI18N
         labelParameterDauer.setName("labelParameterDauer"); // NOI18N
 
-        comboBoxParameterBeginnVerteilung.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Normalverteilung", "Gleichverteilung", "Exponentialverteilung", "Chi-Quadrat Verteilung" }));
+        comboBoxParameterBeginnVerteilung.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Normalverteilung", "Gleichverteilung" }));
         comboBoxParameterBeginnVerteilung.setName("comboBoxParameterBeginnVerteilung"); // NOI18N
+        comboBoxParameterBeginnVerteilung.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                changeVerteilung(evt);
+            }
+        });
         comboBoxParameterBeginnVerteilung.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionBeginnVerteilung(evt);
             }
         });
 
-        labelParameterBeginnMittel.setText("Mittelwert:");
+        labelParameterBeginnMittel.setText(resourceMap.getString("labelParameterBeginnMittel.text")); // NOI18N
         labelParameterBeginnMittel.setName("labelParameterBeginnMittel"); // NOI18N
 
-        labelParameterBeginnVarianz.setText("Varianz:");
+        labelParameterBeginnVarianz.setText(resourceMap.getString("labelParameterBeginnVarianz.text")); // NOI18N
         labelParameterBeginnVarianz.setName("labelParameterBeginnVarianz"); // NOI18N
 
-        textParameterBeginnVarianz.setText("3");
+        textParameterBeginnVarianz.setText(resourceMap.getString("textParameterBeginnVarianz.text")); // NOI18N
         textParameterBeginnVarianz.setName("textParameterBeginnVarianz"); // NOI18N
         textParameterBeginnVarianz.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -205,7 +274,7 @@ public class GeneratorView extends FrameView {
             }
         });
 
-        textParameterBeginnMittel.setText("10");
+        textParameterBeginnMittel.setText(resourceMap.getString("textParameterBeginnMittel.text")); // NOI18N
         textParameterBeginnMittel.setName("textParameterBeginnMittel"); // NOI18N
         textParameterBeginnMittel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -213,7 +282,7 @@ public class GeneratorView extends FrameView {
             }
         });
 
-        comboBoxParameterDauerVerteilung.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Normalverteilung", "Gleichverteilung", "Exponentialverteilung", "Chi-Quadrat Verteilung" }));
+        comboBoxParameterDauerVerteilung.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Normalverteilung", "Gleichverteilung" }));
         comboBoxParameterDauerVerteilung.setName("comboBoxParameterDauerVerteilung"); // NOI18N
         comboBoxParameterDauerVerteilung.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -221,11 +290,10 @@ public class GeneratorView extends FrameView {
             }
         });
 
-        labelParameterDauerA.setText("Mittelwert:");
+        labelParameterDauerA.setText(resourceMap.getString("labelParameterDauerA.text")); // NOI18N
         labelParameterDauerA.setName("labelParameterDauerA"); // NOI18N
 
-        textParameterDauerA.setMinimumSize(new Dimension(75,12));
-        textParameterDauerA.setText("10");
+        textParameterDauerA.setText(resourceMap.getString("textParameterDauerA.text")); // NOI18N
         textParameterDauerA.setName("textParameterDauerA"); // NOI18N
         textParameterDauerA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -233,11 +301,10 @@ public class GeneratorView extends FrameView {
             }
         });
 
-        labelParameterDauerB.setText("Varianz:");
+        labelParameterDauerB.setText(resourceMap.getString("labelParameterDauerB.text")); // NOI18N
         labelParameterDauerB.setName("labelParameterDauerB"); // NOI18N
 
-        textParameterDauerB.setMinimumSize(new Dimension(75,12));
-        textParameterDauerB.setText("3");
+        textParameterDauerB.setText(resourceMap.getString("textParameterDauerB.text")); // NOI18N
         textParameterDauerB.setName("textParameterDauerB"); // NOI18N
         textParameterDauerB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -309,31 +376,22 @@ public class GeneratorView extends FrameView {
 
         jPanel1.setName("jPanel1"); // NOI18N
 
-        labelSeed.setText("Seed:");
-        labelSeed.setName("labelSeed"); // NOI18N
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
 
-        textSeed.setMinimumSize(new Dimension(160, 12));
-        textSeed.setText("1");
-        textSeed.setName("textSeed"); // NOI18N
-        textSeed.addActionListener(new java.awt.event.ActionListener() {
+        jTextField1.setText(resourceMap.getString("jTextField1.text")); // NOI18N
+        jTextField1.setName("jTextField1"); // NOI18N
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textSeedActionPerformed(evt);
+                jTextField1ActionPerformed(evt);
             }
         });
 
-        buttonErzeugen.setText("Erzeugen & Speichern..");
+        buttonErzeugen.setText(resourceMap.getString("buttonErzeugen.text")); // NOI18N
         buttonErzeugen.setName("buttonErzeugen"); // NOI18N
         buttonErzeugen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonErzeugenActionPerformed(evt);
-            }
-        });
-
-        buttonSeedGenerieren.setText("Seed generieren");
-        buttonSeedGenerieren.setName("buttonSeedGenerieren"); // NOI18N
-        buttonSeedGenerieren.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSeedGenerierenActionPerformed(evt);
             }
         });
 
@@ -342,49 +400,40 @@ public class GeneratorView extends FrameView {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(labelSeed)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textSeed, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonSeedGenerieren, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(65, 65, 65))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(buttonErzeugen)
-                        .addContainerGap())))
+                .addGap(58, 58, 58)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonErzeugen)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textSeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelSeed)
-                    .addComponent(buttonSeedGenerieren))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonErzeugen)
-                .addContainerGap(23, Short.MAX_VALUE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(buttonErzeugen))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         mainPanel.add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
         menuBar.setName("menuBar"); // NOI18N
 
-        fileMenu.setText("Datei");
+        fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getActionMap(GeneratorView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
-        exitMenuItem.setText("Schließen");
-        exitMenuItem.setToolTipText("Schließen der Anwendung");
         exitMenuItem.setName("exitMenuItem"); // NOI18N
         fileMenu.add(exitMenuItem);
 
         menuBar.add(fileMenu);
 
-        helpMenu.setText("Hilfe");
+        helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
         helpMenu.setName("helpMenu"); // NOI18N
 
         aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
@@ -393,195 +442,147 @@ public class GeneratorView extends FrameView {
 
         menuBar.add(helpMenu);
 
+        statusPanel.setName("statusPanel"); // NOI18N
+
+        statusPanelSeparator.setName("statusPanelSeparator"); // NOI18N
+
+        statusMessageLabel.setName("statusMessageLabel"); // NOI18N
+
+        statusAnimationLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        statusAnimationLabel.setName("statusAnimationLabel"); // NOI18N
+
+        progressBar.setName("progressBar"); // NOI18N
+
+        javax.swing.GroupLayout statusPanelLayout = new javax.swing.GroupLayout(statusPanel);
+        statusPanel.setLayout(statusPanelLayout);
+        statusPanelLayout.setHorizontalGroup(
+            statusPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(statusPanelSeparator, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+            .addGroup(statusPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(statusMessageLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 350, Short.MAX_VALUE)
+                .addComponent(statusAnimationLabel)
+                .addContainerGap())
+            .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+        );
+        statusPanelLayout.setVerticalGroup(
+            statusPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(statusPanelLayout.createSequentialGroup()
+                .addComponent(statusPanelSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(statusPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(statusMessageLabel)
+                    .addComponent(statusAnimationLabel)
+                    .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(3, 3, 3))
+        );
+
         setComponent(mainPanel);
         setMenuBar(menuBar);
+        setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void actionBeginnVerteilung(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionBeginnVerteilung 
-		
-    	switch (comboBoxParameterBeginnVerteilung.getSelectedIndex()) {
-		case 0: {
-            labelParameterBeginnMittel.setVisible(true);
-            labelParameterBeginnVarianz.setVisible(true);
-            textParameterBeginnVarianz.setVisible(true);
-            textParameterBeginnMittel.setVisible(true);
-            labelParameterBeginnMittel.setText("Mittelwert:");
-            labelParameterBeginnVarianz.setText("Varianz:");
-            textParameterBeginnMittel.setText("10");
-            textParameterBeginnVarianz.setText("3");
-		}
-			break;
-		case 1: {
+    private void changeVerteilung(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_changeVerteilung
+        if (comboBoxParameterBeginnVerteilung.getSelectedIndex() == 1) {
             labelParameterBeginnMittel.setVisible(false);
             labelParameterBeginnVarianz.setVisible(false);
             textParameterBeginnVarianz.setVisible(false);
             textParameterBeginnMittel.setVisible(false);
-		}
-			break;
-		case 2: {
+        } else {
             labelParameterBeginnMittel.setVisible(true);
-            labelParameterBeginnVarianz.setVisible(false);
-            textParameterBeginnVarianz.setVisible(false);
+            labelParameterBeginnVarianz.setVisible(true);
+            textParameterBeginnVarianz.setVisible(true);
             textParameterBeginnMittel.setVisible(true);
-            labelParameterBeginnMittel.setText("Lambda:");
-            textParameterBeginnMittel.setText("0.5");
-		}
-			break;
-		case 3: {
-            labelParameterBeginnMittel.setVisible(true);
-            labelParameterBeginnVarianz.setVisible(false);
-            textParameterBeginnVarianz.setVisible(false);
-            textParameterBeginnMittel.setVisible(true);
-            labelParameterBeginnMittel.setText("n:");
-            textParameterBeginnMittel.setText("3");
-		}
-			break;
+        }
+    }//GEN-LAST:event_changeVerteilung
 
-		default:
-			break;
-		}
+    private void actionBeginnVerteilung(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionBeginnVerteilung
+        if (comboBoxParameterBeginnVerteilung.getSelectedIndex() == 1) {
+            labelParameterBeginnMittel.setVisible(false);
+            labelParameterBeginnVarianz.setVisible(false);
+            textParameterBeginnVarianz.setVisible(false);
+            textParameterBeginnMittel.setVisible(false);
+        } else {
+            labelParameterBeginnMittel.setVisible(true);
+            labelParameterBeginnVarianz.setVisible(true);
+            textParameterBeginnVarianz.setVisible(true);
+            textParameterBeginnMittel.setVisible(true);
+        }
     }//GEN-LAST:event_actionBeginnVerteilung
 
     private void comboBoxParameterDauerVerteilungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxParameterDauerVerteilungActionPerformed
-		switch (comboBoxParameterDauerVerteilung.getSelectedIndex()) {
-		case 0: {
-            labelParameterDauerA.setVisible(true);
-            labelParameterDauerB.setVisible(true);
-            textParameterDauerA.setVisible(true);
-            textParameterDauerB.setVisible(true);
+        if (comboBoxParameterDauerVerteilung.getSelectedIndex() == 1) {
+            labelParameterDauerA.setText("Untere Grenze:");
+            labelParameterDauerB.setText("Obere Grenze:");
+        } else {
             labelParameterDauerA.setText("Mittelwert:");
             labelParameterDauerB.setText("Varianz:");
-            textParameterDauerA.setText("10");
-            textParameterDauerB.setText("3");
-		}
-			break;
-		case 1: {
-            labelParameterDauerA.setVisible(true);
-            labelParameterDauerB.setVisible(true);
-            textParameterDauerA.setVisible(true);
-            textParameterDauerB.setVisible(true);
-            labelParameterDauerA.setText("Beginn:");
-            labelParameterDauerB.setText("Ende:");
-            textParameterDauerA.setText("0");
-            textParameterDauerB.setText("10");
-		}
-			break;
-		case 2: {
-            labelParameterDauerA.setVisible(true);
-            labelParameterDauerB.setVisible(false);
-            textParameterDauerA.setVisible(true);
-            textParameterDauerB.setVisible(false);
-            labelParameterDauerA.setText("Lambda:");
-            textParameterDauerA.setText("0.5");
-		}
-			break;
-		case 3: {
-            labelParameterDauerA.setVisible(true);
-            labelParameterDauerB.setVisible(false);
-            textParameterDauerA.setVisible(true);
-            textParameterDauerB.setVisible(false);
-            labelParameterDauerA.setText("n:");
-            textParameterDauerA.setText("3");
-		}
-			break;
-
-		default:
-			break;
-		}
+        }
     }//GEN-LAST:event_comboBoxParameterDauerVerteilungActionPerformed
 
     private void buttonErzeugenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonErzeugenActionPerformed
-        // Variablendeklaration
+		XXXPseudoRandomDataGenerator generator;
     	File dataFile;
 		int jobCount;
 		int start;
 		int ende;
 		long seed;
-		
-		double parameterBeginn1;
-		double parameterBeginn2;
-		
-		double parameterDauer1;
-		double parameterDauer2;
+
+		double myBeginn;
+		double sigmaSqrBeginn;
+		int aBegin;
+		int bBegin;
+
+		double myDauer;
+		double sigmaSqrDauer;
+		int aDauer;
+		int bDauer;
 		
 		try {
 			 jobCount = Integer.parseInt(jTextField2.getText());
 			 start = Integer.parseInt(textZeitraumBeginn.getText());
 			 ende = Integer.parseInt(textZeitraumEnde.getText());
-			 seed = Long.parseLong(textSeed.getText());
+			 seed = Integer.parseInt(jTextField1.getText());
 
-			 parameterBeginn1 = Double.parseDouble(textParameterBeginnMittel.getText());
-			 parameterBeginn2 = Double.parseDouble(textParameterBeginnVarianz.getText());
+			 myBeginn = Double.parseDouble(textParameterBeginnMittel.getText());
+			 sigmaSqrBeginn = Double.parseDouble(textParameterBeginnVarianz.getText());
+			 aBegin = start;
+			 bBegin = ende;
 
-			 parameterDauer1 = Double.parseDouble(textParameterDauerA.getText());
-			 parameterDauer2 = Double.parseDouble(textParameterDauerB.getText());
-			 
-			Verteilungsparameter beginn; 
-			Verteilungsparameter dauer;
-			 
-			 switch (comboBoxParameterBeginnVerteilung.getSelectedIndex()) {
-				case 0: {
-					double[] parameterB = {parameterBeginn1, parameterBeginn2};
-		            beginn = new Verteilungsparameter(Verteilung.Normal, parameterB);
-				}
-					break;
-				case 1: {
-					double[] parameterB = {start, ende};
-		            beginn = new Verteilungsparameter(Verteilung.Uniform, parameterB);
-				}
-					break;
-				case 2: {
-					double[] parameterB = {parameterBeginn1};
-		            beginn = new Verteilungsparameter(Verteilung.Exponential, parameterB);
-				}
-					break;
-				case 3: {
-					double[] parameterB = {parameterBeginn1};
-		            beginn = new Verteilungsparameter(Verteilung.ChiSqr, parameterB);
-				}
-					break;
-
-				default:
-					throw new Exception(); 
-				}
-			 
-			 switch (comboBoxParameterDauerVerteilung.getSelectedIndex()) {
-				case 0: {
-					double[] parameterD = {parameterDauer1, parameterDauer2};
-					dauer = new Verteilungsparameter(Verteilung.Normal, parameterD);
-				}
-					break;
-				case 1: {
-					double[] parameterD = {parameterDauer1, parameterDauer2};
-					dauer = new Verteilungsparameter(Verteilung.Uniform, parameterD);
-				}
-					break;
-				case 2: {
-					double[] parameterD = {parameterDauer1};
-					dauer = new Verteilungsparameter(Verteilung.Exponential, parameterD);
-				}
-					break;
-				case 3: {
-					double[] parameterD = {parameterDauer1};
-					dauer = new Verteilungsparameter(Verteilung.ChiSqr, parameterD);
-				}
-					break;
-
-				default:
-					throw new Exception(); 
-				}
-			 
-			 ScenarioGenerator generator = new ScenarioGenerator(jobCount, start, ende, seed, beginn, dauer);
-   	
-   	int returnVal = generatorFileChooser.showSaveDialog(this.getFrame());
+			 myDauer = Double.parseDouble(textParameterDauerA.getText());
+			 sigmaSqrDauer = Double.parseDouble(textParameterDauerB.getText());
+			 aDauer = Integer.parseInt(textParameterDauerA.getText());
+			 bDauer = Integer.parseInt(textParameterDauerB.getText());
+    	
+    	int returnVal = generatorFileChooser.showSaveDialog(this.getFrame());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			dataFile = generatorFileChooser.getSelectedFile();
-			generator.saveDataFile(dataFile);
+			if (comboBoxParameterBeginnVerteilung.getSelectedIndex() == 0) { // Beginn
+																				// Normalverteilt
+				if (comboBoxParameterDauerVerteilung.getSelectedIndex() == 0) { // Dauer
+																				// Normalverteilt
+					generator = new XXXPseudoRandomDataGenerator(jobCount, start, ende, seed, dataFile, myBeginn, sigmaSqrBeginn, myDauer, sigmaSqrDauer);
+				} else { // Dauer Uniformverteilt
+					generator = new XXXPseudoRandomDataGenerator(jobCount, start, ende, seed, dataFile, myBeginn, sigmaSqrBeginn, aDauer, bDauer);
+				}
+			} else { // Beginn Uniformverteilt
+				if (comboBoxParameterDauerVerteilung.getSelectedIndex() == 0) { // Dauer
+																				// Normalverteilt
+					generator = new XXXPseudoRandomDataGenerator(jobCount, start, ende, seed, dataFile, myDauer, sigmaSqrDauer);
+				} else { // Dauer Uniformverteilt
+					generator = new XXXPseudoRandomDataGenerator(jobCount, start, ende, seed, dataFile, aDauer, bDauer);
+				}
+			}
+
 		}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		       
+        
+        
+        
+         
     }//GEN-LAST:event_buttonErzeugenActionPerformed
 
     private void textZeitraumBeginnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textZeitraumBeginnActionPerformed
@@ -608,20 +609,17 @@ public class GeneratorView extends FrameView {
         // TODO add your handling code here:
     }//GEN-LAST:event_textParameterDauerBActionPerformed
 
-    private void textSeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textSeedActionPerformed
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_textSeedActionPerformed
-
-    private void buttonSeedGenerierenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSeedGenerierenActionPerformed
-       textSeed.setText(Long.toString((new SecureRandom()).nextLong()));
-    }//GEN-LAST:event_buttonSeedGenerierenActionPerformed
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonErzeugen;
-    private javax.swing.JButton buttonSeedGenerieren;
     private javax.swing.JComboBox comboBoxParameterBeginnVerteilung;
     private javax.swing.JComboBox comboBoxParameterDauerVerteilung;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel labelAnzahl;
     private javax.swing.JLabel labelParameter;
@@ -631,7 +629,6 @@ public class GeneratorView extends FrameView {
     private javax.swing.JLabel labelParameterDauer;
     private javax.swing.JLabel labelParameterDauerA;
     private javax.swing.JLabel labelParameterDauerB;
-    private javax.swing.JLabel labelSeed;
     private javax.swing.JLabel labelZeitraum;
     private javax.swing.JLabel labelZeitraumBeginn;
     private javax.swing.JLabel labelZeitraumEnde;
@@ -639,15 +636,23 @@ public class GeneratorView extends FrameView {
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JPanel panelParameter;
     private javax.swing.JPanel panelZeitraum;
+    private javax.swing.JProgressBar progressBar;
+    private javax.swing.JLabel statusAnimationLabel;
+    private javax.swing.JLabel statusMessageLabel;
+    private javax.swing.JPanel statusPanel;
     private javax.swing.JTextField textParameterBeginnMittel;
     private javax.swing.JTextField textParameterBeginnVarianz;
     private javax.swing.JTextField textParameterDauerA;
     private javax.swing.JTextField textParameterDauerB;
-    private javax.swing.JTextField textSeed;
     private javax.swing.JTextField textZeitraumBeginn;
     private javax.swing.JTextField textZeitraumEnde;
     // End of variables declaration//GEN-END:variables
 
+    private final Timer messageTimer;
+    private final Timer busyIconTimer;
+    private final Icon idleIcon;
+    private final Icon[] busyIcons = new Icon[15];
+    private int busyIconIndex = 0;
 
     private JDialog aboutBox;
 }

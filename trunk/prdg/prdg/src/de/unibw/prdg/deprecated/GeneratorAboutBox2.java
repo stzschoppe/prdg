@@ -2,13 +2,18 @@
  * GeneratorAboutBox.java
  */
 
-package de.unibw.prdg.gui;
+package de.unibw.prdg.deprecated;
 
 import org.jdesktop.application.Action;
 
-public class GeneratorAboutBox extends javax.swing.JDialog {
+import de.unibw.prdg.gui.GeneratorAboutBox;
+import de.unibw.prdg.gui.GeneratorApp;
 
-    public GeneratorAboutBox(java.awt.Frame parent) {
+
+
+public class GeneratorAboutBox2 extends javax.swing.JDialog {
+
+    public GeneratorAboutBox2(java.awt.Frame parent) {
         super(parent);
         initComponents();
         getRootPane().setDefaultButton(closeButton);
@@ -98,13 +103,13 @@ public class GeneratorAboutBox extends javax.swing.JDialog {
                             .addComponent(appVendorLabel)
                             .addComponent(appHomepageLabel)))
                     .addComponent(appTitleLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(appDescLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                    .addComponent(appDescLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
                     .addComponent(closeButton))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 187, Short.MAX_VALUE)
+            .addComponent(imageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(appTitleLabel)
@@ -122,7 +127,7 @@ public class GeneratorAboutBox extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(homepageLabel)
                     .addComponent(appHomepageLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addComponent(closeButton)
                 .addContainerGap())
         );

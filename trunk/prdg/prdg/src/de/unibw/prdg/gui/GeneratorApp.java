@@ -39,7 +39,7 @@ public class GeneratorApp extends SingleFrameApplication {
     /**
      * Main method launching the application.
      */
-    public static void main(String[] args) throws ClassNotFoundException {
+    public static void main(String[] args) {
         launch(GeneratorApp.class, args);
     }
 }
