@@ -4,8 +4,14 @@
 
 package de.unibw.prdg.gui;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.jdesktop.application.Action;
 
@@ -41,7 +47,7 @@ public class GeneratorAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel imageLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.GeneratorApp.class).getContext().getResourceMap(GeneratorAboutBox.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getResourceMap(GeneratorAboutBox.class);
         //setTitle(resourceMap.getString("title")); // NOI18N
         setModal(true);
         setName("aboutBox"); // NOI18N
@@ -63,11 +69,52 @@ public class GeneratorAboutBox extends javax.swing.JDialog {
         homepageLabel.setText("Homepage:");
 
 
-
-        appDescLabel.setText("<html>Anwendung zum Erzeugen von Szenarien.");
+        appDescLabel.setText("<html> Bei uniformen Verteilungen ist die untere Grenze inklusive, die obere ist exklusive. <br />"
+        		+"Wird das vorgegebene Ende des Zeitraums überschritten, wird nicht abgeschnitten.");
         
-        setTitle("About: ScenarioGenerator");
-        appHomepageLabel.setText("http://code.google.com/p/prdg/");
+        setTitle("About: Szenario Generator");
+        appHomepageLabel.setText("<html><head></head><body><a href=\""+"http://code.google.com/p/prdg/"+"\">"+"http://code.google.com/p/prdg/"+"</a></body></html>");
+        appHomepageLabel.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					Desktop.getDesktop().browse(new URI("http://code.google.com/p/prdg/"));
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				
+			}
+		});
         appVendorLabel.setText("Universität der Bundeswehr München");
         appVersionLabel.setText("0.2");
         closeButton.setSize(63,25);

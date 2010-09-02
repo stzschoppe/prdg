@@ -2,12 +2,11 @@
  * GeneratorApp.java
  */
 
-package de.unibw.prdg;
+package de.unibw.prdg.gui;
 
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
 
-import de.unibw.prdg.gui.GeneratorView;
 
 /**
  * The main class of the application.
@@ -44,4 +43,5 @@ public class GeneratorApp extends SingleFrameApplication {
     public static void main(String[] args) {
         launch(GeneratorApp.class, args);
     }
+
 }
