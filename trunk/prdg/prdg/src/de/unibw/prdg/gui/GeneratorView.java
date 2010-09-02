@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.jdesktop.application.Action;
@@ -642,6 +643,7 @@ public class GeneratorView extends FrameView {
 		}
 		} catch (Exception e) {
 			Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage());
+			JOptionPane.showMessageDialog(null, e.getMessage() + " Erzeugung der Daten abgebrochen.", "Fehler", JOptionPane.ERROR_MESSAGE);
 		}
 		       
     }//GEN-LAST:event_buttonErzeugenActionPerformed
