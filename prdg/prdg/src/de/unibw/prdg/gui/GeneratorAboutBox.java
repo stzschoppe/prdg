@@ -4,6 +4,9 @@
 
 package de.unibw.prdg.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import org.jdesktop.application.Action;
 
 public class GeneratorAboutBox extends javax.swing.JDialog {
@@ -25,7 +28,7 @@ public class GeneratorAboutBox extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
+    	final javax.swing.JDialog thisView = this;
         closeButton = new javax.swing.JButton();
         javax.swing.JLabel appTitleLabel = new javax.swing.JLabel();
         javax.swing.JLabel versionLabel = new javax.swing.JLabel();
@@ -38,46 +41,47 @@ public class GeneratorAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel imageLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getResourceMap(GeneratorAboutBox.class);
-        setTitle(resourceMap.getString("title")); // NOI18N
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.GeneratorApp.class).getContext().getResourceMap(GeneratorAboutBox.class);
+        //setTitle(resourceMap.getString("title")); // NOI18N
         setModal(true);
         setName("aboutBox"); // NOI18N
         setResizable(false);
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getActionMap(GeneratorAboutBox.class, this);
-        closeButton.setAction(actionMap.get("closeAboutBox")); // NOI18N
-        closeButton.setName("closeButton"); // NOI18N
+        //javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.GeneratorApp.class).getContext().getActionMap(GeneratorAboutBox.class, this);
+       // closeButton.setAction(actionMap.get("closeAboutBox")); // NOI18N
 
         appTitleLabel.setFont(appTitleLabel.getFont().deriveFont(appTitleLabel.getFont().getStyle() | java.awt.Font.BOLD, appTitleLabel.getFont().getSize()+4));
-        appTitleLabel.setText(resourceMap.getString("Application.title")); // NOI18N
-        appTitleLabel.setName("appTitleLabel"); // NOI18N
 
         versionLabel.setFont(versionLabel.getFont().deriveFont(versionLabel.getFont().getStyle() | java.awt.Font.BOLD));
-        versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
-        versionLabel.setName("versionLabel"); // NOI18N
-
-        appVersionLabel.setText(resourceMap.getString("Application.version")); // NOI18N
-        appVersionLabel.setName("appVersionLabel"); // NOI18N
+        versionLabel.setText("Product Version:");
 
         vendorLabel.setFont(vendorLabel.getFont().deriveFont(vendorLabel.getFont().getStyle() | java.awt.Font.BOLD));
-        vendorLabel.setText(resourceMap.getString("vendorLabel.text")); // NOI18N
-        vendorLabel.setName("vendorLabel"); // NOI18N
+        vendorLabel.setText("Vendor:");
 
-        appVendorLabel.setText(resourceMap.getString("Application.vendor")); // NOI18N
-        appVendorLabel.setName("appVendorLabel"); // NOI18N
 
         homepageLabel.setFont(homepageLabel.getFont().deriveFont(homepageLabel.getFont().getStyle() | java.awt.Font.BOLD));
-        homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
-        homepageLabel.setName("homepageLabel"); // NOI18N
+        homepageLabel.setText("Homepage:");
 
-        appHomepageLabel.setText(resourceMap.getString("Application.homepage")); // NOI18N
-        appHomepageLabel.setName("appHomepageLabel"); // NOI18N
 
-        appDescLabel.setText(resourceMap.getString("appDescLabel.text")); // NOI18N
-        appDescLabel.setName("appDescLabel"); // NOI18N
 
-        imageLabel.setIcon(resourceMap.getIcon("imageLabel.icon")); // NOI18N
-        imageLabel.setName("imageLabel"); // NOI18N
+        appDescLabel.setText("<html>Anwendung zum Erzeugen von Szenarien.");
+        
+        setTitle("About: ScenarioGenerator");
+        appHomepageLabel.setText("http://code.google.com/p/prdg/");
+        appVendorLabel.setText("Universität der Bundeswehr München");
+        appVersionLabel.setText("0.2");
+        closeButton.setSize(63,25);
+        closeButton.setText("Close");
+        closeButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				thisView.dispose();
+				
+			}
+		});
+
+        imageLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/unibw/prdg/gui/resources/about.png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
