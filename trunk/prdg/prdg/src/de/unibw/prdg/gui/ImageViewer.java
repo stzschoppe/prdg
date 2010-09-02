@@ -3,6 +3,8 @@ package de.unibw.prdg.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.net.URL;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
@@ -11,9 +13,9 @@ public class ImageViewer extends JFrame implements ActionListener
 	class ViewComponent extends JComponent
 	{
 	  private Image image;
-	  public void setImage( File file )
+	  public void setImage( URL url )
 	  {
-	    image = Toolkit.getDefaultToolkit().getImage( file.getAbsolutePath() );
+	    image = Toolkit.getDefaultToolkit().getImage( url );
 	    if ( image != null )
 	      repaint();
 	  }
@@ -30,10 +32,10 @@ public class ImageViewer extends JFrame implements ActionListener
 	}
 	}
   public ViewComponent viewComponent = new ViewComponent();
-	File uniform = new File("res\\uniform.png");
-	File gausian = new File("res\\gausian.png");
-	File exponential = new File("res\\exponential.png");
-	File chi = new File("res\\chi.png");
+	URL uniform = ImageViewer.class.getResource("resources/uniform.png");
+	URL gausian = ImageViewer.class.getResource("resources/gausian.png");
+	URL exponential = ImageViewer.class.getResource("resources/exponential.png");
+	URL chi = ImageViewer.class.getResource("resources/chi.png");
 	
   public ImageViewer()
   {

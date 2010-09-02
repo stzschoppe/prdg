@@ -9,6 +9,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.security.SecureRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -19,7 +21,6 @@ import org.jdesktop.application.Action;
 import org.jdesktop.application.FrameView;
 import org.jdesktop.application.SingleFrameApplication;
 
-import de.unibw.prdg.GeneratorApp;
 import de.unibw.prdg.ScenarioGenerator;
 import de.unibw.prdg.Verteilung;
 import de.unibw.prdg.Verteilungsparameter;
@@ -436,7 +437,7 @@ public class GeneratorView extends FrameView {
         fileMenu.setText("Datei");
         fileMenu.setName("fileMenu"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.GeneratorApp.class).getContext().getActionMap(GeneratorView.class, this);
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getActionMap(GeneratorView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setText("Schlieﬂen");
         exitMenuItem.setToolTipText("Schlieﬂen der Anwendung");
@@ -640,7 +641,7 @@ public class GeneratorView extends FrameView {
 			generator.saveDataFile(dataFile);
 		}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage());
 		}
 		       
     }//GEN-LAST:event_buttonErzeugenActionPerformed

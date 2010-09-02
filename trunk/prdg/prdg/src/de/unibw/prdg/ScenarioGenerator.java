@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.unibw.prdg.exceptions.ConstrainException;
 
@@ -112,11 +114,11 @@ public class ScenarioGenerator {
 			// if (jobListe[i][0]+ jobListe[i][1] > ende)
 			// jobListe[i][1] = ende - jobListe[i][0];
 
-			//System.out.println(jobListe[i][0] + "-" + jobListe[i][1]);
+			// System.out.println(jobListe[i][0] + "-" + jobListe[i][1]);
 		}
-		System.out.println("Beginn (" + getStichprobenMittelBeginn() + ", " 
+		System.out.println("Beginn (" + getStichprobenMittelBeginn() + ", "
 				+ getStichprobenVarianzBeginn() + ")");
-		System.out.println("Dauer (" + getStichprobenMittelDauer() + ", " 
+		System.out.println("Dauer (" + getStichprobenMittelDauer() + ", "
 				+ getStichprobenVarianzDauer() + ")");
 	}
 
@@ -133,18 +135,18 @@ public class ScenarioGenerator {
 		header += "#		c endtime,\n";
 		header += "#		b and c inclusive\n";
 		header += "#		\n";
-		header += "#		seed:\t\t " + seed +"\n";
-		header += "#		jobcount:\t " + jobCount +"\n";
-		header += "#		interval:\t [" + start + ", " + ende +"]\n";
+		header += "#		seed:\t\t " + seed + "\n";
+		header += "#		jobcount:\t " + jobCount + "\n";
+		header += "#		interval:\t [" + start + ", " + ende + "]\n";
 		header += "#		\n";
-		header += "#		starttime distribution:\t" + beginnVerteilung +  "\n";
-		header += "#		duration distribution:\t" + dauerVerteilung +  "\n";
+		header += "#		starttime distribution:\t" + beginnVerteilung + "\n";
+		header += "#		duration distribution:\t" + dauerVerteilung + "\n";
 		header += "#		\n";
 		header += "#		value\t\tmean\t\t,\tvariance\n";
-		header += "#		" + "starttime\t" + getStichprobenMittelBeginn() + "\t,\t" 
-								+ getStichprobenVarianzBeginn() + "\n";
-		header += "#		" + "duration\t" + getStichprobenMittelDauer() + "\t,\t" 
-								+ getStichprobenVarianzDauer() + "";
+		header += "#		" + "starttime\t" + getStichprobenMittelBeginn()
+				+ "\t,\t" + getStichprobenVarianzBeginn() + "\n";
+		header += "#		" + "duration\t" + getStichprobenMittelDauer() + "\t,\t"
+				+ getStichprobenVarianzDauer() + "";
 		header += "\n";
 
 		fw.write(header);
