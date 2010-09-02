@@ -137,7 +137,10 @@ public class ScenarioGenerator {
 		header += "#		jobcount:\t " + jobCount +"\n";
 		header += "#		interval:\t [" + start + ", " + ende +"]\n";
 		header += "#		\n";
-		header += "#		value\t\tmean\t,\tvariance\n";
+		header += "#		starttime distribution:\t" + beginnVerteilung +  "\n";
+		header += "#		duration distribution:\t" + dauerVerteilung +  "\n";
+		header += "#		\n";
+		header += "#		value\t\tmean\t\t,\tvariance\n";
 		header += "#		" + "starttime\t" + getStichprobenMittelBeginn() + "\t,\t" 
 								+ getStichprobenVarianzBeginn() + "\n";
 		header += "#		" + "duration\t" + getStichprobenMittelDauer() + "\t,\t" 
