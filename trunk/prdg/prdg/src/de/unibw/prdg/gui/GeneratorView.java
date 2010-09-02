@@ -5,6 +5,8 @@
 package de.unibw.prdg.gui;
 
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.security.SecureRandom;
 
@@ -17,6 +19,7 @@ import org.jdesktop.application.Action;
 import org.jdesktop.application.FrameView;
 import org.jdesktop.application.SingleFrameApplication;
 
+import de.unibw.prdg.GeneratorApp;
 import de.unibw.prdg.ScenarioGenerator;
 import de.unibw.prdg.Verteilung;
 import de.unibw.prdg.Verteilungsparameter;
@@ -25,11 +28,13 @@ import de.unibw.prdg.Verteilungsparameter;
  * The application's main frame.
  */
 public class GeneratorView extends FrameView {
-	
+	private ImageViewer imageViewer;
 	private JFileChooser generatorFileChooser;
+
 
     public GeneratorView(SingleFrameApplication app) {
         super(app);
+        getFrame().setTitle("Szenario Generator");
 
         initComponents();
     }
@@ -44,6 +49,8 @@ public class GeneratorView extends FrameView {
         GeneratorApp.getApplication().show(aboutBox);
     }
 
+
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -52,6 +59,57 @@ public class GeneratorView extends FrameView {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        this.getFrame().addWindowListener(
+                new WindowListener() {
+					
+					@Override
+					public void windowOpened(WindowEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowIconified(WindowEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeiconified(WindowEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowDeactivated(WindowEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowClosing(WindowEvent e) {
+	                      System.exit(0);	
+					}
+					
+					@Override
+					public void windowClosed(WindowEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void windowActivated(WindowEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+    	
+    	imageViewer = new ImageViewer();
+    	GeneratorApp.getApplication().show(imageViewer);
+    	imageViewer.setSize(505,410);
+    	imageViewer.setResizable(false);
+    	imageViewer.setLocation(0, 0);
+    	
     	generatorFileChooser = new javax.swing.JFileChooser();
     	generatorFileChooser.setCurrentDirectory(new java.io.File("data"));
     	generatorFileChooser.setDialogTitle("Erzeugten Datensatz speichern");
@@ -190,6 +248,8 @@ public class GeneratorView extends FrameView {
                 actionBeginnVerteilung(evt);
             }
         });
+        comboBoxParameterBeginnVerteilung.addActionListener(imageViewer);
+        comboBoxParameterBeginnVerteilung.setSelectedIndex(0);
 
         labelParameterBeginnMittel.setText("Mittelwert:");
         labelParameterBeginnMittel.setName("labelParameterBeginnMittel"); // NOI18N
@@ -220,6 +280,7 @@ public class GeneratorView extends FrameView {
                 comboBoxParameterDauerVerteilungActionPerformed(evt);
             }
         });
+        comboBoxParameterDauerVerteilung.addActionListener(imageViewer);
 
         labelParameterDauerA.setText("Mittelwert:");
         labelParameterDauerA.setName("labelParameterDauerA"); // NOI18N
@@ -375,7 +436,7 @@ public class GeneratorView extends FrameView {
         fileMenu.setText("Datei");
         fileMenu.setName("fileMenu"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.gui.GeneratorApp.class).getContext().getActionMap(GeneratorView.class, this);
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(de.unibw.prdg.GeneratorApp.class).getContext().getActionMap(GeneratorView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setText("Schlieﬂen");
         exitMenuItem.setToolTipText("Schlieﬂen der Anwendung");
